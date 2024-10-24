@@ -1,6 +1,6 @@
 # Olist_Project
 
-'''sql
+```sql
 CREATE TABLE `iron-foundry-431315-d7.olist_project.olist_customers_analysis` AS
 SELECT 
     customers.customer_id,
@@ -20,4 +20,4 @@ JOIN
     USING(order_id) 
 GROUP BY
     customers.customer_id, customers.customer_unique_id, orders.order_id, orders.order_status, orders.order_purchase_timestamp
-'''
+```
