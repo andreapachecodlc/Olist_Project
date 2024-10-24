@@ -63,4 +63,10 @@ JOIN
     USING(order_id)
 GROUP BY
     orders.order_id, orders.order_purchase_timestamp, orders.order_delivered_customer_date, orders.order_estimated_delivery_date, review.review_score
+
+
+
+Borrando missing values en logistic:
+DELETE FROM `iron-foundry-431315-d7.olist_project.olist_logistics_analysis`
+WHERE delivery_time IS NULL;
 ```
