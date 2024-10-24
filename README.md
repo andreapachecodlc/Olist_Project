@@ -1,15 +1,19 @@
 # Olist_Project
 
 ```sql
-CREATE TABLE `iron-foundry-431315-d7.olist_project.olist_customers_analysis` AS
+CREATE OR REPLACE TABLE `iron-foundry-431315-d7.olist_project.olist_customers_analysis` AS
 SELECT 
     customers.customer_id,
     customers.customer_unique_id,
+    customers.customer_city,
+    customers.customer_state,
     orders.order_id,
     orders.order_status,
     orders.order_purchase_timestamp,
     SUM(items.price) AS total_spent,
-    COUNT(orders.order_id) AS total_orders
+    COUNT(orders.order_id) AS total_orders,
+    geo.geolocation_lat,
+    geo.geolocation_lng
 FROM
     `iron-foundry-431315-d7.olist_project.olist_customers_dataset` AS customers
 JOIN
@@ -18,8 +22,11 @@ JOIN
 JOIN
     `iron-foundry-431315-d7.olist_project.olist_order_items_dataset` AS items
     USING(order_id) 
+JOIN
+    `iron-foundry-431315-d7.olist_project.olist_geolocation_dataset` AS geo
+    ON geo.geolocation_zip_code_prefix = customers.customer_zip_code_prefix
 GROUP BY
-    customers.customer_id, customers.customer_unique_id, orders.order_id, orders.order_status, orders.order_purchase_timestamp
+    customers.customer_id, customers.customer_unique_id,customers.customer_city, customers.customer_state,orders.order_id, orders.order_status, orders.order_purchase_timestamp, geo.geolocation_lat,geo.geolocation_lng
 
 
 
