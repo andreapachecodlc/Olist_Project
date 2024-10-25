@@ -1,87 +1,43 @@
 # Olist_Project
 
 ```sql
-CREATE OR REPLACE TABLE `iron-foundry-431315-d7.olist_project.olist_customers_analysis` AS
-SELECT 
-    customers.customer_id,
-    customers.customer_unique_id,
-    customers.customer_city,
-    customers.customer_state,
-    orders.order_id,
-    orders.order_status,
-    orders.order_purchase_timestamp,
-    SUM(items.price) AS total_spent,
-    COUNT(orders.order_id) AS total_orders,
-    geo.geolocation_lat,
-    geo.geolocation_lng
-FROM
-    `iron-foundry-431315-d7.olist_project.olist_customers_dataset` AS customers
-JOIN
-    `iron-foundry-431315-d7.olist_project.olist_orders_dataset` AS orders
-    USING(customer_id)
-JOIN
-    `iron-foundry-431315-d7.olist_project.olist_order_items_dataset` AS items
-    USING(order_id) 
-JOIN
-    `iron-foundry-431315-d7.olist_project.olist_geolocation_dataset` AS geo
-    ON geo.geolocation_zip_code_prefix = customers.customer_zip_code_prefix
-GROUP BY
-    customers.customer_id, customers.customer_unique_id,customers.customer_city, customers.customer_state,orders.order_id, orders.order_status, orders.order_purchase_timestamp, geo.geolocation_lat,geo.geolocation_lng
-
-
-
-
-CREATE OR REPLACE TABLE `iron-foundry-431315-d7.olist_project.olist_product_analysis` AS
+CREATE OR REPLACE TABLE `iron-foundry-431315-d7.olist_project.olist_order_review_pay` AS
 SELECT
-    orders.customer_id,  
-    products.product_id,
-    products.product_category_name,
-    translation.string_field_1 AS product_category_name_english,
-    SUM(items.price) AS total_revenue,
-    COUNT(items.order_item_id) AS total_items_sold
-FROM
-    `iron-foundry-431315-d7.olist_project.olist_order_items_dataset` AS items
-JOIN
-    `iron-foundry-431315-d7.olist_project.olist_products_dataset` AS products
-    USING(product_id)
-JOIN
-    `iron-foundry-431315-d7.olist_project.product_category_name_translation` AS translation
-    ON product_category_name = string_field_0
-JOIN
-    `iron-foundry-431315-d7.olist_project.olist_orders_dataset` AS orders  
-    USING(order_id)
-GROUP BY
-    orders.customer_id,  
-    products.product_id, 
-    products.product_category_name, 
-    product_category_name_english
+    o.*,
+    r.review_score,
+    p.payment_sequential,
+    p.payment_type,
+    p.payment_installments,
+    p.payment_value,
+FROM 
+    `iron-foundry-431315-d7.olist_project.olist_orders_dataset` o
+LEFT JOIN 
+    `iron-foundry-431315-d7.olist_project.olist_order_reviews_dataset` r
+    USING(order_id) 
+LEFT JOIN
+    `iron-foundry-431315-d7.olist_project.olist_order_payments_dataset` p 
+    USING(order_id) 
 
 
 
-CREATE OR REPLACE TABLE `iron-foundry-431315-d7.olist_project.olist_logistics_analysis` AS
-SELECT 
-    orders.customer_id,  
-    orders.order_id,
-    orders.order_purchase_timestamp,
-    orders.order_delivered_customer_date,
-    orders.order_estimated_delivery_date,
-    TIMESTAMP_DIFF(orders.order_delivered_customer_date, orders.order_purchase_timestamp, DAY) AS delivery_time,
-    review.review_score,
-    SUM(items.price) AS total_order_value
-FROM
-    `iron-foundry-431315-d7.olist_project.olist_orders_dataset` AS orders
-JOIN
-    `iron-foundry-431315-d7.olist_project.olist_order_reviews_dataset` AS review
-    USING(order_id)
-JOIN
-    `iron-foundry-431315-d7.olist_project.olist_order_items_dataset` AS items
-    USING(order_id)
-GROUP BY
-    orders.customer_id,  
-    orders.order_id, 
-    orders.order_purchase_timestamp, 
-    orders.order_delivered_customer_date, 
-    orders.order_estimated_delivery_date, 
-    review.review_score
+CREATE OR REPLACE TABLE `iron-foundry-431315-d7.olist_project.olist_items_product_sellers` AS
+SELECT
+    i.*,
+    c.string_field_1,
+    s.seller_city,
+    s.seller_state,
+    s.seller_zip_code_prefix
+FROM 
+    `iron-foundry-431315-d7.olist_project.olist_order_items_dataset` i
+LEFT JOIN 
+    `iron-foundry-431315-d7.olist_project.olist_products_dataset` p
+    USING(product_id) 
+LEFT JOIN
+    `iron-foundry-431315-d7.olist_project.product_category_name_translation` c 
+    ON 	product_category_name = string_field_0
+LEFT JOIN
+    `iron-foundry-431315-d7.olist_project.olist_sellers_dataset` s
+    USING(seller_id) 
+
 
 ```
