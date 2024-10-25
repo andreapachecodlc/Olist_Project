@@ -31,8 +31,9 @@ GROUP BY
 
 
 
-CREATE TABLE `iron-foundry-431315-d7.olist_project.olist_product_analysis` AS
+CREATE OR REPLACE TABLE `iron-foundry-431315-d7.olist_project.olist_product_analysis` AS
 SELECT
+    orders.customer_id,  
     products.product_id,
     products.product_category_name,
     translation.string_field_1 AS product_category_name_english,
@@ -45,14 +46,21 @@ JOIN
     USING(product_id)
 JOIN
     `iron-foundry-431315-d7.olist_project.product_category_name_translation` AS translation
-    ON product_category_name=string_field_0
+    ON product_category_name = string_field_0
+JOIN
+    `iron-foundry-431315-d7.olist_project.olist_orders_dataset` AS orders  
+    USING(order_id)
 GROUP BY
-    products.product_id, products.product_category_name, product_category_name_english
+    orders.customer_id,  
+    products.product_id, 
+    products.product_category_name, 
+    product_category_name_english
 
 
 
-CREATE TABLE `iron-foundry-431315-d7.olist_project.olist_logistics_analysis` AS
+CREATE OR REPLACE TABLE `iron-foundry-431315-d7.olist_project.olist_logistics_analysis` AS
 SELECT 
+    orders.customer_id,  
     orders.order_id,
     orders.order_purchase_timestamp,
     orders.order_delivered_customer_date,
@@ -69,11 +77,11 @@ JOIN
     `iron-foundry-431315-d7.olist_project.olist_order_items_dataset` AS items
     USING(order_id)
 GROUP BY
-    orders.order_id, orders.order_purchase_timestamp, orders.order_delivered_customer_date, orders.order_estimated_delivery_date, review.review_score
+    orders.customer_id,  
+    orders.order_id, 
+    orders.order_purchase_timestamp, 
+    orders.order_delivered_customer_date, 
+    orders.order_estimated_delivery_date, 
+    review.review_score
 
-
-
-Borrando missing values en logistic:
-DELETE FROM `iron-foundry-431315-d7.olist_project.olist_logistics_analysis`
-WHERE delivery_time IS NULL;
 ```
