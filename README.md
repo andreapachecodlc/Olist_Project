@@ -24,6 +24,9 @@ CREATE OR REPLACE TABLE `iron-foundry-431315-d7.olist_project.olist_items_produc
 SELECT
     i.*,
     c.string_field_1,
+    p.product_name_lenght,
+    p.product_description_lenght,
+    p.product_photos_qty,   
     s.seller_city,
     s.seller_state,
     s.seller_zip_code_prefix
